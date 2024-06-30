@@ -27,3 +27,5 @@ go.work.sum
 .idea
 .golangci.yml
 golangci.yml
+
+test.go
