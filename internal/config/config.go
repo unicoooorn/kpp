@@ -4,13 +4,15 @@ import (
 	"errors"
 	"os"
 	"strings"
+	"time"
 
 	validatorPkg "github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	DiskLimit int `mapstructure:"disk_limit"`
+	DiskLimit        int           `mapstructure:"disk_limit"`
+	MonitoringPeriod time.Duration `mapstructure:"monitoring_period"`
 }
 
 func LoadApp(configPath string) (*Config, error) {
