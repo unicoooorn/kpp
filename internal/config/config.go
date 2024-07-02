@@ -11,7 +11,7 @@ import (
 )
 
 type Config struct {
-	DiskLimit        int           `mapstructure:"disk_limit"`
+	DiskLimit        int64         `mapstructure:"disk_limit"`
 	MonitoringPeriod time.Duration `mapstructure:"monitoring_period"`
 }
 
