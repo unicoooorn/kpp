@@ -48,22 +48,22 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 }
 
 func (dc *Client) Kill(ctx context.Context, containerID string) error {
-	return dc.ContainerKill(ctx, containerID, "SIGKILL")
+	return dc.cli.ContainerKill(ctx, containerID, "SIGKILL")
 }
 
 func (dc *Client) Pause(ctx context.Context, containerID string) error {
-	return dc.ContainerPause(ctx, containerID)
+	return dc.cli.ContainerPause(ctx, containerID)
 }
 
 func (dc *Client) Stop(ctx context.Context, containerID string) error {
 	/*
-	Timeout before SIGKILL & Signal can be specified
+		Timeout before SIGKILL & Signal can be specified
 	*/
-	options := container.StopOptions {"", nil}
-	return dc.ContainerStop(ctx, containerID, options)
+	options := container.StopOptions{"", nil}
+	return dc.cli.ContainerStop(ctx, containerID, options)
 }
 
 func (dc *Client) Restart(ctx context.Context, containerID string) error {
-	options := container.StopOptions {"", nil}
-	return dc.ContainerRestart(ctx, containerID, options)
+	options := container.StopOptions{"", nil}
+	return dc.cli.ContainerRestart(ctx, containerID, options)
 }
