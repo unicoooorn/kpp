@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/unicoooorn/docker-monitoring-tool/internal/checker"
 	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
 	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
 	"github.com/unicoooorn/docker-monitoring-tool/internal/tool/mocks"
@@ -18,12 +19,14 @@ import (
 func TestTool_check(t *testing.T) {
 	mockDockerClient := new(mocks.ContainerManager)
 	cfg := config.Config{
-		DiskLimit:        80,
 		MonitoringPeriod: time.Second * 1,
+		DiskUsage: config.DiskUsageConfig{
+			Max: 80,
+		},
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	tool := New(mockDockerClient, cfg, *logger)
+	tool := New(mockDockerClient, []Checker{checker.NewDiskUsageChecker(cfg.DiskUsage)}, cfg, *logger)
 
 	containersStats := map[string]model.Stat{
 		"container1": {DiskUsage: 50},
@@ -45,12 +48,14 @@ func TestTool_check(t *testing.T) {
 func TestTool_Run(t *testing.T) {
 	mockDockerClient := new(mocks.ContainerManager)
 	cfg := config.Config{
-		DiskLimit:        80,
 		MonitoringPeriod: time.Millisecond * 10,
+		DiskUsage: config.DiskUsageConfig{
+			Max: 80,
+		},
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	tool := New(mockDockerClient, cfg, *logger)
+	tool := New(mockDockerClient, []Checker{checker.NewDiskUsageChecker(cfg.DiskUsage)}, cfg, *logger)
 
 	containersStats := map[string]model.Stat{
 		"container1": {DiskUsage: 50},

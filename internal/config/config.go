@@ -11,8 +11,12 @@ import (
 )
 
 type Config struct {
-	DiskLimit        int64         `mapstructure:"disk_limit"`
-	MonitoringPeriod time.Duration `mapstructure:"monitoring_period"`
+	MonitoringPeriod time.Duration   `mapstructure:"monitoring_period"`
+	DiskUsage        DiskUsageConfig `mapstructure:"disk_usage"`
+}
+
+type DiskUsageConfig struct {
+	Max int64 `mapstructure:"max"`
 }
 
 func LoadApp(configPath string) (*Config, error) {
