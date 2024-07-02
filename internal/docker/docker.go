@@ -55,10 +55,15 @@ func (dc *Client) Pause(ctx context.Context, containerID string) error {
 	return dc.ContainerPause(ctx, containerID)
 }
 
-func (dc *Client) Stop(ctx, context.Context, containerID string) error {
+func (dc *Client) Stop(ctx context.Context, containerID string) error {
 	/*
 	Timeout before SIGKILL & Signal can be specified
 	*/
 	options := container.StopOptions {nil, ""}
+	return dc.ContainerStop(ctx, containerID, options)
+}
+
+func (dc *Client) Stop(ctx context.Context, containerID string) error {
+	options := container.StopOptions {"", nil}
 	return dc.ContainerStop(ctx, containerID, options)
 }
