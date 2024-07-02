@@ -60,7 +60,7 @@ func (dc *Client) Stop(ctx context.Context, containerID string) error {
 	Timeout before SIGKILL & Signal can be specified
 	*/
 	options := container.StopOptions {"", nil}
-	return dc.ContainerRestart(ctx, containerID, options)
+	return dc.ContainerStop(ctx, containerID, options)
 }
 
 func (dc *Client) Restart(ctx context.Context, containerID string) error {
