@@ -2,11 +2,11 @@ package docker
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
 )
 
 type Client struct {
@@ -27,40 +27,27 @@ func NewClient() (*Client, error) {
 	return dc, nil
 }
 
-func NewClientWithOpts(ops ...client.Opt) (*Client, error) {
-	cli, err := client.NewClientWithOpts(ops...)
-	if err != nil {
-		return nil, err
-	}
-	dc := &Client{
-		cli: cli,
-	}
-	return dc, nil
-}
-
 func (dc *Client) Close() error {
 	return dc.cli.Close()
 }
 
-func (dc *Client) ContainerStats(ctx context.Context, id string) (uint64, error) {
-	response, err := dc.cli.ContainerStatsOneShot(ctx, id)
+func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, error) {
+	stats := make(map[string]model.Stat)
+	containers, err := dc.cli.ContainerList(ctx, container.ListOptions{
+		All: true,
+	})
 	if err != nil {
-		return 0, err
+		return nil, fmt.Errorf("list containers: %w", err)
 	}
-	defer response.Body.Close()
-	var stats container.StatsResponse
-	if err := json.NewDecoder(response.Body).Decode(&stats); err != nil {
-		return 0, err
+
+	for _, c := range containers {
+		stats[c.ID] = model.Stat{DiskUsage: c.SizeRw + c.SizeRootFs}
 	}
-	//TODO возвращать больше информации
-	return stats.MemoryStats.Usage, nil //кол-во в байтах
+
+	return stats, nil
 }
 
-// default - only active containers
-func (dc *Client) Containers(ctx context.Context, options container.ListOptions) ([]types.Container, error) {
-	containers, err := dc.cli.ContainerList(ctx, options)
-	if err != nil {
-		return nil, err
-	}
-	return containers, nil
+func (dc *Client) Kill(ctx context.Context, containerID string) error {
+	// todo: killing container
+	return nil
 }
