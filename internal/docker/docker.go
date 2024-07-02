@@ -48,6 +48,17 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 }
 
 func (dc *Client) Kill(ctx context.Context, containerID string) error {
-	// todo: killing container
-	return nil
+	return dc.ContainerKill(ctx, containerID, "SIGKILL")
+}
+
+func (dc *Client) Pause(ctx context.Context, containerID string) error {
+	return dc.ContainerPause(ctx, containerID)
+}
+
+func (dc *Client) Stop(ctx, context.Context, containerID string) error {
+	/*
+	Timeout before SIGKILL & Signal can be specified
+	*/
+	options := container.StopOptions {nil, ""}
+	return dc.ContainerStop(ctx, containerID, options)
 }
