@@ -13,13 +13,15 @@ type Tool struct {
 	cfg              config.Config
 	logger           slog.Logger
 	containerManager ContainerManager
+	checkers         []Checker
 }
 
-func New(statsRetriever ContainerManager, cfg config.Config, logger slog.Logger) *Tool {
+func New(statsRetriever ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger) *Tool {
 	return &Tool{
+		checkers:         checkers,
+		containerManager: statsRetriever,
 		cfg:              cfg,
 		logger:           logger,
-		containerManager: statsRetriever,
 	}
 }
 
@@ -30,13 +32,14 @@ func (t *Tool) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return fmt.Errorf("context canceled: %w", ctx.Err())
 		case <-ticker.C:
-			stats, err := t.check(ctx)
+			statuses, err := t.check(ctx)
 			if err != nil {
-				slog.Error("check stats", slog.Any("err", err))
+				slog.Error("check statuses", slog.Any("err", err))
 			}
 
-			for container, statusOk := range stats {
+			for container, statusOk := range statuses {
 				if !statusOk {
+					t.logger.Info("killing container", slog.String("container", container))
 					if err := t.containerManager.Kill(ctx, container); err != nil {
 						t.logger.Error("kill container",
 							slog.String("container", container),
@@ -50,9 +53,6 @@ func (t *Tool) Run(ctx context.Context) error {
 }
 
 func (t *Tool) check(ctx context.Context) (map[string]bool, error) {
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-
 	statuses := make(map[string]bool)
 
 	containersStats, err := t.containerManager.ContainersStats(ctx)
@@ -62,10 +62,12 @@ func (t *Tool) check(ctx context.Context) (map[string]bool, error) {
 
 	for id, stat := range containersStats {
 		ok := true
-		if stat.DiskUsage >= t.cfg.DiskLimit {
-			ok = false
+		for _, c := range t.checkers {
+			if !c.Check(ctx, stat) {
+				ok = false
+				break
+			}
 		}
-
 		statuses[id] = ok
 	}
 
