@@ -3,6 +3,8 @@ package docker
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -31,6 +33,20 @@ func (dc *Client) Close() error {
 	return dc.cli.Close()
 }
 
+func DirSize(path string) (int64, error) {
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	return size, err
+}
+
 func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, error) {
 	stats := make(map[string]model.Stat)
 	containers, err := dc.cli.ContainerList(ctx, container.ListOptions{
@@ -39,9 +55,23 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 	if err != nil {
 		return nil, fmt.Errorf("list containers: %w", err)
 	}
-
 	for _, c := range containers {
-		stats[c.ID] = model.Stat{DiskUsage: c.SizeRw + c.SizeRootFs}
+		var totalDirSize int64 = 0
+		for _, mount := range c.Mounts {
+			if mount.RW {
+				if mount.Source == "" {
+					continue
+				}
+				size, err := DirSize(mount.Source[9:]) // remove /host_mnt prefix
+				if err != nil {
+					return nil, err
+				}
+
+				totalDirSize += size
+			}
+			fmt.Println()
+		}
+		stats[c.ID] = model.Stat{DiskUsage: totalDirSize}
 	}
 
 	return stats, nil

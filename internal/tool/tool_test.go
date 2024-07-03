@@ -61,16 +61,11 @@ func TestTool_Run(t *testing.T) {
 		"container1": {DiskUsage: 50},
 		"container2": {DiskUsage: 90},
 	}
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*50)
 	defer cancel()
 
 	mockDockerClient.On("ContainersStats", mock.Anything).Return(containersStats, nil)
 	mockDockerClient.On("Kill", ctx, "container2").Return(nil)
-
-	go func() {
-		time.Sleep(time.Millisecond * 50)
-		cancel()
-	}()
 
 	err := tool.Run(ctx)
 	require.Error(t, err)

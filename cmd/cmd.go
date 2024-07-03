@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/unicoooorn/docker-monitoring-tool/internal/checker"
 	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
 	"github.com/unicoooorn/docker-monitoring-tool/internal/docker"
 	"github.com/unicoooorn/docker-monitoring-tool/internal/tool"
@@ -20,7 +21,7 @@ func newRootCmd() *cobra.Command {
 		RunE: run,
 	}
 
-	rootCmd.PersistentFlags().StringP("config", "c", "configs/config.yaml", "specify a config file")
+	rootCmd.PersistentFlags().StringP("config", "c", "config/config.yaml", "specify a config file")
 
 	return rootCmd
 }
@@ -47,7 +48,11 @@ func run(cmd *cobra.Command, _ []string) error {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	if err := tool.New(client, *cfg, *logger).Run(ctx); errors.Is(err, context.Canceled) {
+	checkerList := make([]tool.Checker, 0)
+
+	checkerList = append(checkerList, checker.NewDiskUsageChecker(cfg.DiskUsage))
+
+	if err := tool.New(client, checkerList, *cfg, *logger).Run(ctx); errors.Is(err, context.Canceled) {
 		logger.Info("shutdown")
 		return nil
 	} else if err != nil {

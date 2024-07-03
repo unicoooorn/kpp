@@ -32,13 +32,14 @@ func (t *Tool) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return fmt.Errorf("context canceled: %w", ctx.Err())
 		case <-ticker.C:
-			stats, err := t.check(ctx)
+			statuses, err := t.check(ctx)
 			if err != nil {
-				slog.Error("check stats", slog.Any("err", err))
+				slog.Error("check statuses", slog.Any("err", err))
 			}
 
-			for container, statusOk := range stats {
+			for container, statusOk := range statuses {
 				if !statusOk {
+					t.logger.Info("killing container", slog.String("container", container))
 					if err := t.containerManager.Kill(ctx, container); err != nil {
 						t.logger.Error("kill container",
 							slog.String("container", container),
