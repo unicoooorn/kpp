@@ -19,7 +19,7 @@ type Config struct {
 	MonitoringPeriod time.Duration        `mapstructure:"monitoring_period" validate:"required"`
 	DiskUsage        DiskUsageConfig      `mapstructure:"disk_usage"`
 	FileMonitoring   FileMonitoringConfig `mapstructure:"file_monitoring"`
-  Strat            ActionStrat          `mapstructure:"strat"`
+	Strat            ActionStrat          `mapstructure:"strat"`
 }
 
 type ActionStrat string
