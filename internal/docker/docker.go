@@ -39,7 +39,7 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 		return nil, fmt.Errorf("list containers: %w", err)
 	}
 	for _, c := range containers {
-		var totalDirSize int64 = 0
+		stat := model.Stat{}
 		for _, mount := range c.Mounts {
 			if mount.RW {
 				if mount.Source == "" {
@@ -49,12 +49,12 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 				if err != nil {
 					return nil, err
 				}
-
-				totalDirSize += size
+				stat.Volumes = append(stat.Volumes, mount.Source[9:])
+				stat.DiskUsage += size
 			}
 			fmt.Println()
 		}
-		stats[c.ID] = model.Stat{DiskUsage: totalDirSize}
+		stats[c.ID] = stat
 	}
 
 	return stats, nil
@@ -69,11 +69,11 @@ func (dc *Client) Pause(ctx context.Context, containerID string) error {
 }
 
 func (dc *Client) Stop(ctx context.Context, containerID string) error {
-	options := container.StopOptions{"", nil}
+	options := container.StopOptions{Signal: "", Timeout: nil}
 	return dc.cli.ContainerStop(ctx, containerID, options)
 }
 
 func (dc *Client) Restart(ctx context.Context, containerID string) error {
-	options := container.StopOptions{"", nil}
+	options := container.StopOptions{Signal: "", Timeout: nil}
 	return dc.cli.ContainerRestart(ctx, containerID, options)
 }

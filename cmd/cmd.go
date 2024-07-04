@@ -64,6 +64,16 @@ func run(cmd *cobra.Command, _ []string) error {
 
 	checkerList = append(checkerList, checker.NewDiskUsageChecker(cfg.DiskUsage))
 
+	stats, err := client.ContainersStats(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to receive container stats: %w", err)
+	}
+	fmchecker, err := checker.NewFileMonitoringChecker(cfg.FileMonitoring, stats)
+	if err != nil {
+		return fmt.Errorf("failed to init file monitoring checker %w", err)
+	}
+	checkerList = append(checkerList, fmchecker)
+
 	if err := tool.New(client, checkerList, *cfg, *logger).Run(ctx); errors.Is(err, context.Canceled) {
 		logger.Info("shutdown")
 		return nil
