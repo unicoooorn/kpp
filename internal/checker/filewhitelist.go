@@ -15,6 +15,11 @@ type FileMonitoringChecker struct {
 	Files map[string]time.Time
 }
 
+/*
+Creates new FileMonitoringChecker instance
+---
+Проходится по маунтам и записывает ModTime каждого файла в Files map
+*/
 func NewFileMonitoringChecker(cfg config.FileMonitoringConfig, stat model.Stat) (*FileMonitoringChecker, error) {
 	checker := FileMonitoringChecker{cfg, make(map[string]time.Time)}
 	for _, mount := range stat.Volumes {
@@ -34,6 +39,19 @@ func NewFileMonitoringChecker(cfg config.FileMonitoringConfig, stat model.Stat) 
 	return &checker, nil
 }
 
+/*
+Checker for FileMonitoringChecker
+---
+В случае Whitelist:
+Проходится по каждому файлу в маунтах
+Проверяет, есть ли он в Whitelist, если есть --> return
+Если нет --> сверка ModTime
+---
+В случае Blacklist:
+Проходится по каждому файлу в маунтах
+Проверяет, есть ли он в Whitelist, если есть --> сверка ModTime
+Если нет --> return
+*/
 func (d *FileMonitoringChecker) Check(_ context.Context, stat model.Stat) (bool, error) {
 	flag := true
 	if d.cfg.Type == config.WhitelistMode {
