@@ -14,14 +14,28 @@ type Tool struct {
 	logger           slog.Logger
 	containerManager ContainerManager
 	checkers         []Checker
+	action           func(ContainerManager, context.Context, string) error
 }
 
-func New(statsRetriever ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger) *Tool {
+func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger) *Tool {
+
+	var action func(ContainerManager, context.Context, string) error
+	switch cfg.Strat {
+	case config.StratKill:
+		action = ContainerManager.Kill
+	case config.StratPause:
+		action = ContainerManager.Pause
+	case config.StratStop:
+		action = ContainerManager.Stop
+	case config.StratRestart:
+		action = ContainerManager.Restart
+	}
 	return &Tool{
 		checkers:         checkers,
-		containerManager: statsRetriever,
+		containerManager: containerManager,
 		cfg:              cfg,
 		logger:           logger,
+		action:           action,
 	}
 }
 
@@ -37,10 +51,10 @@ func (t *Tool) Run(ctx context.Context) error {
 				slog.Error("check statuses", slog.Any("err", err))
 			}
 
-			for container, statusOk := range statuses {
-				if !statusOk {
+			for container, status := range statuses {
+				if !status {
 					t.logger.Info("killing container", slog.String("container", container))
-					if err := t.containerManager.Kill(ctx, container); err != nil {
+					if err := t.action(t.containerManager, ctx, container); err != nil {
 						t.logger.Error("kill container",
 							slog.String("container", container),
 							slog.Any("err", err),
