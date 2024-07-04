@@ -1,4 +1,4 @@
 FROM python
 COPY . .
 WORKDIR .
-CMD ["python3", "script.py", "work_dir", "10", "512"]
+ENTRYPOINT ["python3", "litterer.py"]

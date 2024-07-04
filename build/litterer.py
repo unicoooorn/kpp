@@ -1,34 +1,35 @@
 import os
 import sys
 import time
+import random
 
 
-def file_writer(file_path, file_size):
+def file_writer(file_path: str, file_size: int):
     with open(file_path, 'w') as file:
         chars_num = int(file_size)
-        file.write("0" * chars_num)
+        file.write(str(random.randbytes(chars_num)))
 
 
-def make_files(dir_name, files_num, file_size):
-    dir_name = '/data/' + dir_name
+def make_files(files_num: int, file_size: int):
+    dir_name = "/data/litter"
     if not os.path.exists(dir_name):
-        print("creating dir", dir_name)
+        print("creating dir", dir_name, flush=True)
         os.makedirs(dir_name, exist_ok=True)
 
     for i in range(0, files_num):
-        file_path = dir_name + '/file' + str(i)
+        file_path = f"{dir_name}/file{i}"
         file_writer(file_path, file_size)
-        print("created file", file_path)
-        time.sleep(3)
 
 
 if __name__ == '__main__':
-    arg_list = sys.argv
+    space_to_litter: int = int(sys.argv[1])
 
-    dir_name = str(arg_list[1])
-    files_num = int(arg_list[2])
-    file_size = int(arg_list[3])
+    file_size: int = min(space_to_litter, 1000 * 1000) # 10MB per file
 
-    make_files(dir_name, files_num, file_size)
-    while (True):
-        time.sleep(2)
+    files_count: int = space_to_litter // file_size  # 10MB per file
+
+    make_files(files_count, file_size)
+
+    print("done creating files", flush=True)
+    while True:
+        time.sleep(1000)
