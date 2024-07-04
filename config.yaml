@@ -1,7 +1,0 @@
-disk_usage:
-  max: -1
-file_monitoring:
-	type: whitelist
-	files:
-		- /home/username/projects/docker-monitoring/docker-monitoring-tool/test
-monitoring_period: 1s

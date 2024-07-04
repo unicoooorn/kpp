@@ -9,8 +9,6 @@ import (
 	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
 )
 
-var Action func(ContainerManager, context.Context, string) error = ContainerManager.Kill
-
 type Tool struct {
 	cfg              config.Config
 	logger           slog.Logger
