@@ -10,13 +10,24 @@ import (
 	"github.com/spf13/viper"
 )
 
+type FileMonitoringType string
+
+const WhitelistMode FileMonitoringType = "whitelist"
+const BlacklistMode FileMonitoringType = "blacklist"
+
 type Config struct {
-	MonitoringPeriod time.Duration   `mapstructure:"monitoring_period"`
-	DiskUsage        DiskUsageConfig `mapstructure:"disk_usage"`
+	MonitoringPeriod time.Duration        `mapstructure:"monitoring_period" validate:"required"`
+	DiskUsage        DiskUsageConfig      `mapstructure:"disk_usage"`
+	FileMonitoring   FileMonitoringConfig `mapstructure:"file_monitoring"`
 }
 
 type DiskUsageConfig struct {
 	Max int64 `mapstructure:"max"`
+}
+
+type FileMonitoringConfig struct {
+	Type  FileMonitoringType `mapstructure:"type"`
+	Files []string           `mapstructure:"files"`
 }
 
 func LoadApp(configPath string) (*Config, error) {
