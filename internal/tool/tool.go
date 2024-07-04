@@ -16,14 +16,16 @@ type Tool struct {
 	logger           slog.Logger
 	containerManager ContainerManager
 	checkers         []Checker
+	action           func(ContainerManager, context.Context, string) error
 }
 
-func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger) *Tool {
+func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger, action func(ContainerManager, context.Context, string) error) *Tool {
 	return &Tool{
 		checkers:         checkers,
 		containerManager: containerManager,
 		cfg:              cfg,
 		logger:           logger,
+		action:           action,
 	}
 }
 
