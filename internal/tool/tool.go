@@ -14,14 +14,26 @@ type Tool struct {
 	logger           slog.Logger
 	containerManager ContainerManager
 	checkers         []Checker
+	action           [StatusNum]func(context.Context, string) error
 }
 
-func New(statsRetriever ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger) *Tool {
+type CheckStatus uint8
+
+const (
+	StatusNum = 4
+	Ok        = 0
+	Disk      = 1
+	Blacklist = 2
+	Whitelist = 3
+)
+
+func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger, actions [StatusNum]func(context.Context, string) error) *Tool {
 	return &Tool{
 		checkers:         checkers,
-		containerManager: statsRetriever,
+		containerManager: containerManager,
 		cfg:              cfg,
 		logger:           logger,
+		action:           actions,
 	}
 }
 
@@ -37,10 +49,10 @@ func (t *Tool) Run(ctx context.Context) error {
 				slog.Error("check statuses", slog.Any("err", err))
 			}
 
-			for container, statusOk := range statuses {
-				if !statusOk {
+			for container, status := range statuses {
+				if status != Ok {
 					t.logger.Info("killing container", slog.String("container", container))
-					if err := t.containerManager.Kill(ctx, container); err != nil {
+					if err := t.action[status](ctx, container); err != nil {
 						t.logger.Error("kill container",
 							slog.String("container", container),
 							slog.Any("err", err),
@@ -52,8 +64,8 @@ func (t *Tool) Run(ctx context.Context) error {
 	}
 }
 
-func (t *Tool) check(ctx context.Context) (map[string]bool, error) {
-	statuses := make(map[string]bool)
+func (t *Tool) check(ctx context.Context) (map[string]uint8, error) {
+	statuses := make(map[string]uint8)
 
 	containersStats, err := t.containerManager.ContainersStats(ctx)
 	if err != nil {
@@ -61,14 +73,14 @@ func (t *Tool) check(ctx context.Context) (map[string]bool, error) {
 	}
 
 	for id, stat := range containersStats {
-		ok := true
-		for _, c := range t.checkers {
+		ok := 0
+		for i, c := range t.checkers {
 			if !c.Check(ctx, stat) {
-				ok = false
+				ok = i
 				break
 			}
 		}
-		statuses[id] = ok
+		statuses[id] = uint8(ok)
 	}
 
 	return statuses, nil
