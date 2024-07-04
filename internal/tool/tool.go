@@ -9,8 +9,6 @@ import (
 	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
 )
 
-var Action func(ContainerManager, context.Context, string) error = ContainerManager.Kill
-
 type Tool struct {
 	cfg              config.Config
 	logger           slog.Logger
@@ -19,7 +17,19 @@ type Tool struct {
 	action           func(ContainerManager, context.Context, string) error
 }
 
-func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger, action func(ContainerManager, context.Context, string) error) *Tool {
+func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger) *Tool {
+
+	var action func(ContainerManager, context.Context, string) error
+	switch cfg.Strat {
+	case config.StratKill:
+		action = ContainerManager.Kill
+	case config.StratPause:
+		action = ContainerManager.Pause
+	case config.StratStop:
+		action = ContainerManager.Stop
+	case config.StratRestart:
+		action = ContainerManager.Restart
+	}
 	return &Tool{
 		checkers:         checkers,
 		containerManager: containerManager,
@@ -44,7 +54,7 @@ func (t *Tool) Run(ctx context.Context) error {
 			for container, status := range statuses {
 				if !status {
 					t.logger.Info("killing container", slog.String("container", container))
-					if err := Action(t.containerManager, ctx, container); err != nil {
+					if err := t.action(t.containerManager, ctx, container); err != nil {
 						t.logger.Error("kill container",
 							slog.String("container", container),
 							slog.Any("err", err),
