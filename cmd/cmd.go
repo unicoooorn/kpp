@@ -64,7 +64,20 @@ func run(cmd *cobra.Command, _ []string) error {
 
 	checkerList = append(checkerList, checker.NewDiskUsageChecker(cfg.DiskUsage))
 
-	if err := tool.New(client, checkerList, *cfg, *logger).Run(ctx); errors.Is(err, context.Canceled) {
+	var action func(tool.ContainerManager, context.Context, string) error
+
+	switch cfg.Strat {
+	case config.StratKill:
+		action = tool.ContainerManager.Kill
+	case config.StratPause:
+		action = tool.ContainerManager.Pause
+	case config.StratStop:
+		action = tool.ContainerManager.Stop
+	case config.StratRestart:
+		action = tool.ContainerManager.Restart
+	}
+
+	if err := tool.New(client, checkerList, *cfg, *logger, action).Run(ctx); errors.Is(err, context.Canceled) {
 		logger.Info("shutdown")
 		return nil
 	} else if err != nil {
