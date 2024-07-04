@@ -56,7 +56,7 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 		return nil, fmt.Errorf("list containers: %w", err)
 	}
 	for _, c := range containers {
-		var totalDirSize int64 = 0
+		stat := model.Stat{}
 		for _, mount := range c.Mounts {
 			if mount.RW {
 				if mount.Source == "" {
@@ -66,12 +66,12 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 				if err != nil {
 					return nil, err
 				}
-
-				totalDirSize += size
+				stat.Volumes = append(stats[c.ID].Volumes, mount.Source[9:])
+				stat.DiskUsage += size
 			}
 			fmt.Println()
 		}
-		stats[c.ID] = model.Stat{DiskUsage: totalDirSize}
+		stats[c.ID] = stat
 	}
 
 	return stats, nil
