@@ -1,3 +1,0 @@
-docker build -t CONT_NAME .
-
-docker run -v ABSOULUTE_PATH_TO_WORKDIR:/data CONT_NAME
