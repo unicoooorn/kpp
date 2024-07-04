@@ -49,7 +49,7 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 				if err != nil {
 					return nil, err
 				}
-				stat.Volumes = append(stats[c.ID].Volumes, mount.Source[9:])
+				stat.Volumes = append(stat.Volumes, mount.Source[9:])
 				stat.DiskUsage += size
 			}
 			fmt.Println()
