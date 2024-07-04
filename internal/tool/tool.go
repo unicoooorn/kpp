@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
+	"github.com/unicoooorn/kpp/internal/config"
 )
 
 type Tool struct {

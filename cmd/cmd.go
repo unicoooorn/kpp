@@ -9,10 +9,10 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/checker"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/docker"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/tool"
+	"github.com/unicoooorn/kpp/internal/checker"
+	"github.com/unicoooorn/kpp/internal/config"
+	"github.com/unicoooorn/kpp/internal/docker"
+	"github.com/unicoooorn/kpp/internal/tool"
 )
 
 func newRootCmd() *cobra.Command {

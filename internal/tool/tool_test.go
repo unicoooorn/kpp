@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/checker"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/tool/mocks"
+	"github.com/unicoooorn/kpp/internal/checker"
+	"github.com/unicoooorn/kpp/internal/config"
+	"github.com/unicoooorn/kpp/internal/model"
+	"github.com/unicoooorn/kpp/internal/tool/mocks"
 )
 
 func TestTool_check(t *testing.T) {
