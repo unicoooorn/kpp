@@ -37,7 +37,7 @@ func NewFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]
 }
 
 func (d *FileMonitoringChecker) Check(_ context.Context, stat model.Stat) bool {
-	ok := true
+	checkpassed := true
 
 	for _, mount := range stat.Volumes {
 		if err := filepath.Walk(mount, func(path string, info os.FileInfo, err error) error {
@@ -53,7 +53,7 @@ func (d *FileMonitoringChecker) Check(_ context.Context, stat model.Stat) bool {
 
 				if modtime, ok := d.files[path]; ok {
 					if modtime != info.ModTime() {
-						ok = false
+						checkpassed = false
 						return err
 					}
 				} else {
@@ -65,5 +65,5 @@ func (d *FileMonitoringChecker) Check(_ context.Context, stat model.Stat) bool {
 			return false
 		}
 	}
-	return ok
+	return checkpassed
 }
