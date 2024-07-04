@@ -3,8 +3,6 @@ package docker
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -23,28 +21,13 @@ func NewClient() (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	dc := &Client{
+	return &Client{
 		cli: cli,
-	}
-	return dc, nil
+	}, nil
 }
 
 func (dc *Client) Close() error {
 	return dc.cli.Close()
-}
-
-func DirSize(path string) (int64, error) {
-	var size int64
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return err
-	})
-	return size, err
 }
 
 func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, error) {
@@ -62,7 +45,7 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 				if mount.Source == "" {
 					continue
 				}
-				size, err := DirSize(mount.Source[9:]) // remove /host_mnt prefix
+				size, err := dirSize(mount.Source[9:]) // remove /host_mnt prefix
 				if err != nil {
 					return nil, err
 				}
@@ -86,9 +69,6 @@ func (dc *Client) Pause(ctx context.Context, containerID string) error {
 }
 
 func (dc *Client) Stop(ctx context.Context, containerID string) error {
-	/*
-		Timeout before SIGKILL & Signal can be specified
-	*/
 	options := container.StopOptions{"", nil}
 	return dc.cli.ContainerStop(ctx, containerID, options)
 }
