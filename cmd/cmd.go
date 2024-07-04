@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 
@@ -22,7 +23,7 @@ func newRootCmd() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().StringP("config", "c", "config/config.yaml", "specify a config file")
-
+	rootCmd.Flags().Bool("dry-run", false, "run in a dry-run")
 	return rootCmd
 }
 
@@ -40,7 +41,18 @@ func run(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	client, err := docker.NewClient()
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
+
+	var client interface {
+		tool.ContainerManager
+		io.Closer
+	}
+	if dryRun {
+		fmt.Println("[dry-run] running a dry-run mode")
+		client, err = docker.NewDryRunClient()
+	} else {
+		client, err = docker.NewClient()
+	}
 	if err != nil {
 		return fmt.Errorf("new docker client: %w", err)
 	}
