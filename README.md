@@ -1,6 +1,6 @@
 # kpp - a lightweight tool for imposing limits on docker volumes usage
 
-kpp (from Russian: КПП, контрольно-пропускной пункт) is a lightweight tool dedicated for 
+kpp (from Russian: КПП, контрольно-пропускной пункт, meaning "border point") is a lightweight tool dedicated
 
 
 

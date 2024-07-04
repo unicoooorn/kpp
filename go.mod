@@ -1,4 +1,4 @@
-module github.com/unicoooorn/docker-monitoring-tool
+module github.com/unicoooorn/kpp
 
 go 1.22.3
 

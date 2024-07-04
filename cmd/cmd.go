@@ -17,8 +17,8 @@ import (
 
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:  "dmt",
-		Long: "A tool for monitoring and management of docker containers",
+		Use:  "kpp",
+		Long: "A lightweight tool for imposing limits on docker volumes usage",
 		RunE: run,
 	}
 
