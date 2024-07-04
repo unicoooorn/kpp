@@ -1,0 +1,31 @@
+package test
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/unicoooorn/docker-monitoring-tool/internal/docker"
+)
+
+func main() {
+	dc, _ := docker.NewClient()
+	ctx := context.Background()
+	cs, _ := dc.Containers(ctx, container.ListOptions{})
+	defer dc.Close()
+	//var tmp []func() (uint64, error)
+	//var response []container.StatsResponseReader
+	for i, c := range cs {
+		go func() {
+			//tmp[i], response[i], _ = dc.MonitorContainerStats(ctx, c.ID)
+			//defer response[i].Body.Close()
+			for {
+				a, _ := dc.ContainersStats(ctx, c.ID)
+				fmt.Printf("%v %v\n", i, a)
+				//time.Sleep(1 * time.Second)
+			}
+		}()
+	}
+	a := ""
+	fmt.Scan(&a)
+}
