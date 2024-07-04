@@ -69,11 +69,11 @@ func (dc *Client) Pause(ctx context.Context, containerID string) error {
 }
 
 func (dc *Client) Stop(ctx context.Context, containerID string) error {
-	options := container.StopOptions{"", nil}
+	options := container.StopOptions{Signal: "", Timeout: nil}
 	return dc.cli.ContainerStop(ctx, containerID, options)
 }
 
 func (dc *Client) Restart(ctx context.Context, containerID string) error {
-	options := container.StopOptions{"", nil}
+	options := container.StopOptions{Signal: "", Timeout: nil}
 	return dc.cli.ContainerRestart(ctx, containerID, options)
 }
