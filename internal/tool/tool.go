@@ -9,31 +9,21 @@ import (
 	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
 )
 
+var Action func(ContainerManager, context.Context, string) error = ContainerManager.Kill
+
 type Tool struct {
 	cfg              config.Config
 	logger           slog.Logger
 	containerManager ContainerManager
 	checkers         []Checker
-	action           [StatusNum]func(context.Context, string) error
 }
 
-type CheckStatus uint8
-
-const (
-	StatusNum = 4
-	Ok        = 0
-	Disk      = 1
-	Blacklist = 2
-	Whitelist = 3
-)
-
-func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger, actions [StatusNum]func(context.Context, string) error) *Tool {
+func New(containerManager ContainerManager, checkers []Checker, cfg config.Config, logger slog.Logger) *Tool {
 	return &Tool{
 		checkers:         checkers,
 		containerManager: containerManager,
 		cfg:              cfg,
 		logger:           logger,
-		action:           actions,
 	}
 }
 
@@ -50,9 +40,9 @@ func (t *Tool) Run(ctx context.Context) error {
 			}
 
 			for container, status := range statuses {
-				if status != Ok {
+				if !status {
 					t.logger.Info("killing container", slog.String("container", container))
-					if err := t.action[status](ctx, container); err != nil {
+					if err := Action(t.containerManager, ctx, container); err != nil {
 						t.logger.Error("kill container",
 							slog.String("container", container),
 							slog.Any("err", err),
@@ -64,8 +54,8 @@ func (t *Tool) Run(ctx context.Context) error {
 	}
 }
 
-func (t *Tool) check(ctx context.Context) (map[string]uint8, error) {
-	statuses := make(map[string]uint8)
+func (t *Tool) check(ctx context.Context) (map[string]bool, error) {
+	statuses := make(map[string]bool)
 
 	containersStats, err := t.containerManager.ContainersStats(ctx)
 	if err != nil {
@@ -73,14 +63,14 @@ func (t *Tool) check(ctx context.Context) (map[string]uint8, error) {
 	}
 
 	for id, stat := range containersStats {
-		ok := 0
-		for i, c := range t.checkers {
+		ok := true
+		for _, c := range t.checkers {
 			if !c.Check(ctx, stat) {
-				ok = i
+				ok = false
 				break
 			}
 		}
-		statuses[id] = uint8(ok)
+		statuses[id] = ok
 	}
 
 	return statuses, nil

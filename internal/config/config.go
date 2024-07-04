@@ -13,7 +13,15 @@ import (
 type Config struct {
 	MonitoringPeriod time.Duration   `mapstructure:"monitoring_period"`
 	DiskUsage        DiskUsageConfig `mapstructure:"disk_usage"`
+	Strat            ActionStrat     `mapstructure:"strat"`
 }
+
+type ActionStrat string
+
+const StratKill ActionStrat = "kill"
+const StratPause ActionStrat = "pause"
+const StratStop ActionStrat = "stop"
+const StratRestart ActionStrat = "restart"
 
 type DiskUsageConfig struct {
 	Max int64 `mapstructure:"max"`
