@@ -2,9 +2,9 @@ package checker
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/unicoooorn/kpp/internal/config"
@@ -54,8 +54,7 @@ func (d *BlackListChecker) Check(_ context.Context, stat model.Stat) bool {
 								return err
 							}
 						}
-					} else {
-						fmt.Println(path)
+					} else if strings.HasPrefix(path, el) {
 						checkpassed = false
 					}
 				}
