@@ -10,13 +10,13 @@ import (
 	"github.com/unicoooorn/kpp/internal/model"
 )
 
-type FileMonitoringChecker struct {
+type WhiteListChecker struct {
 	cfg   config.FileMonitoringConfig
 	files map[string]time.Time
 }
 
-func NewFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]model.Stat) (*FileMonitoringChecker, error) {
-	checker := FileMonitoringChecker{cfg, make(map[string]time.Time)}
+func NewWhiteListFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]model.Stat) (*WhiteListChecker, error) {
+	checker := WhiteListChecker{cfg, make(map[string]time.Time)}
 
 	for _, stat := range stats {
 		for _, mount := range stat.Volumes {
@@ -36,7 +36,7 @@ func NewFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]
 	return &checker, nil
 }
 
-func (d *FileMonitoringChecker) Check(_ context.Context, stat model.Stat) bool {
+func (d *WhiteListChecker) Check(_ context.Context, stat model.Stat) bool {
 	checkpassed := true
 
 	for _, mount := range stat.Volumes {

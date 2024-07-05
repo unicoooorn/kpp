@@ -1,4 +1,4 @@
-package checkerBlackList
+package checker
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
 )
 
-type FileMonitoringChecker struct {
+type BlackListChecker struct {
 	cfg   config.FileMonitoringConfig
 	files map[string]time.Time
 }
 
-func NewFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]model.Stat) (*FileMonitoringChecker, error) {
+func NewBlackListFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]model.Stat) (*BlackListChecker, error) {
 	checker := FileMonitoringChecker{cfg, make(map[string]time.Time)}
 
 	for _, stat := range stats {
@@ -36,7 +36,7 @@ func NewFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]
 	return &checker, nil
 }
 
-func (d *FileMonitoringChecker) Check(_ context.Context, stat model.Stat) bool {
+func (d *BlackListChecker) Check(_ context.Context, stat model.Stat) bool {
 	checkpassed := true
 
 	for _, mount := range stat.Volumes {
