@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/unicoooorn/kpp/internal/model"
 )
@@ -34,6 +35,10 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 	stats := make(map[string]model.Stat)
 	containers, err := dc.cli.ContainerList(ctx, container.ListOptions{
 		All: true,
+		Filters: filters.NewArgs(filters.KeyValuePair{
+			Key:   "status",
+			Value: "running",
+		}),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("list containers: %w", err)
@@ -52,7 +57,6 @@ func (dc *Client) ContainersStats(ctx context.Context) (map[string]model.Stat, e
 				stat.Volumes = append(stat.Volumes, mount.Source[9:])
 				stat.DiskUsage += size
 			}
-			fmt.Println()
 		}
 		stats[c.ID] = stat
 	}
