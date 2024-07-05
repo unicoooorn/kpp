@@ -2,12 +2,13 @@ package checker
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
+	"github.com/unicoooorn/kpp/internal/config"
+	"github.com/unicoooorn/kpp/internal/model"
 )
 
 type BlackListChecker struct {
@@ -16,7 +17,7 @@ type BlackListChecker struct {
 }
 
 func NewBlackListFileMonitoringChecker(cfg config.FileMonitoringConfig, stats map[string]model.Stat) (*BlackListChecker, error) {
-	checker := FileMonitoringChecker{cfg, make(map[string]time.Time)}
+	checker := BlackListChecker{cfg, make(map[string]time.Time)}
 
 	for _, stat := range stats {
 		for _, mount := range stat.Volumes {
@@ -47,12 +48,15 @@ func (d *BlackListChecker) Check(_ context.Context, stat model.Stat) bool {
 			if !info.IsDir() {
 				for _, el := range d.cfg.Files {
 					if el == path {
-						if val, ok := d.Files[path]; ok {
+						if val, ok := d.files[path]; ok {
 							if val != info.ModTime() {
 								checkpassed = false
 								return err
 							}
 						}
+					} else {
+						fmt.Println(path)
+						checkpassed = false
 					}
 				}
 			}

@@ -62,6 +62,60 @@ func (_m *ContainerManager) Kill(_a0 context.Context, _a1 string) error {
 	return r0
 }
 
+// Pause provides a mock function with given fields: _a0, _a1
+func (_m *ContainerManager) Pause(_a0 context.Context, _a1 string) error {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Pause")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Restart provides a mock function with given fields: _a0, _a1
+func (_m *ContainerManager) Restart(_a0 context.Context, _a1 string) error {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Restart")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Stop provides a mock function with given fields: _a0, _a1
+func (_m *ContainerManager) Stop(_a0 context.Context, _a1 string) error {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Stop")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewContainerManager creates a new instance of ContainerManager. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewContainerManager(t interface {

@@ -52,6 +52,7 @@ func TestTool_Run(t *testing.T) {
 		DiskUsage: config.DiskUsageConfig{
 			Max: 80,
 		},
+		Strat: config.StratKill,
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
