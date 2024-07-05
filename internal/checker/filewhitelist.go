@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
+	"github.com/unicoooorn/kpp/internal/config"
+	"github.com/unicoooorn/kpp/internal/model"
 )
 
 type FileMonitoringChecker struct {

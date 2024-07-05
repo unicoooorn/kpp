@@ -3,7 +3,7 @@ package tool
 import (
 	"context"
 
-	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
+	"github.com/unicoooorn/kpp/internal/model"
 )
 
 //go:generate mockery --name ContainerManager

@@ -1,6 +1,6 @@
 package main
 
-import "github.com/unicoooorn/docker-monitoring-tool/cmd"
+import "github.com/unicoooorn/kpp/cmd"
 
 func main() {
 	cmd.Execute()

@@ -3,8 +3,8 @@ package checker
 import (
 	"context"
 
-	"github.com/unicoooorn/docker-monitoring-tool/internal/config"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
+	"github.com/unicoooorn/kpp/internal/config"
+	"github.com/unicoooorn/kpp/internal/model"
 )
 
 type DiskUsageChecker struct {

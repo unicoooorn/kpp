@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-	"github.com/unicoooorn/docker-monitoring-tool/internal/model"
+	"github.com/unicoooorn/kpp/internal/model"
 )
 
 var (
