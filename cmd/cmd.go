@@ -68,7 +68,7 @@ func run(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to receive container stats: %w", err)
 	}
-	fmchecker, err := checker.NewFileMonitoringChecker(cfg.FileMonitoring, stats)
+	fmchecker, err := checker.NewWhiteListFileMonitoringChecker(cfg.FileMonitoring, stats)
 	if err != nil {
 		return fmt.Errorf("failed to init file monitoring checker %w", err)
 	}
